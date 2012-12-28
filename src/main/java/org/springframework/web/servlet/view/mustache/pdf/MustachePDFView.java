@@ -19,6 +19,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -27,8 +28,6 @@ import org.springframework.web.servlet.view.mustache.MustacheView;
 import org.w3c.dom.Document;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 import org.xml.sax.InputSource;
-
-import com.lowagie.text.DocumentException;
 
 /**
  * This is the spring view use to generate the content based on a Mustache
@@ -55,23 +54,25 @@ public class MustachePDFView extends MustacheView {
 	StringWriter stringWriter = new StringWriter();
 	getTemplate().execute(stringWriter, model);
 
+	encode(response.getOutputStream(), stringWriter.toString());
+    }
+
+    private boolean encode(ServletOutputStream servletOutputStream,
+	    String content) throws Exception {
 	try {
 	    // parse the markup into an xml Document
-	    final Document doc = DocumentBuilderFactory
-		    .newInstance()
+	    final Document doc = DocumentBuilderFactory.newInstance()
 		    .newDocumentBuilder()
-		    .parse(new InputSource(new StringReader(stringWriter
-			    .toString())));
+		    .parse(new InputSource(new StringReader(content)));
 
 	    final ITextRenderer renderer = new ITextRenderer();
 	    renderer.setDocument(doc, null);
 	    renderer.layout();
-	    renderer.createPDF(response.getOutputStream());
-	} catch (DocumentException e) {
-	    e.printStackTrace();
+	    renderer.createPDF(servletOutputStream);
 	} finally {
-	    response.getOutputStream().flush();
+	    servletOutputStream.flush();
 	}
-
+	return true;
     }
+
 }
