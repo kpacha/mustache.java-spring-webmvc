@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 the original author or authors.
+ * Copyright 2012 the original author or authors.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -13,10 +13,11 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.springframework.web.servlet.view.mustache;
+package org.springframework.web.servlet.view.mustache.pdf;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.view.mustache.AbstractMustacheViewResolver;
 
 /**
  * This resolves views that are returned from the @Controller in Spring MVC.
@@ -40,15 +41,13 @@ import org.springframework.web.servlet.ViewResolver;
  * 
  * In this example "parent" is the name of the mustache template.
  * 
- * @author Sean Scanlon <sean.scanlon@gmail.com>
- * @author Eric D. White <eric@ericwhite.ca>
  * @author kpacha <kpacha666@gmail.com>
  */
-public class MustacheViewResolver extends AbstractMustacheViewResolver
+public class MustachePDFViewResolver extends AbstractMustacheViewResolver
 	implements ViewResolver, InitializingBean {
 
-    public MustacheViewResolver() {
-	setViewClass(MustacheView.class);
+    public MustachePDFViewResolver() {
+	setViewClass(MustachePDFView.class);
     }
 
     /**
@@ -56,6 +55,12 @@ public class MustacheViewResolver extends AbstractMustacheViewResolver
      */
     @Override
     protected Class<?> requiredViewClass() {
-	return MustacheView.class;
+	return MustachePDFView.class;
     }
+
+    @Override
+    protected String getRealUrl(String url) {
+	return url.replaceAll(".pdf", "");
+    }
+
 }
