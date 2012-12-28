@@ -39,6 +39,7 @@ Maven dependency
 
 Spring configuration
 -------------
+The easy way:
 
     <bean id="viewResolver" class="org.springframework.web.servlet.view.mustache.MustacheViewResolver">
         <property name="cache" value="${TEMPLATE_CACHE_ENABLED}" />
@@ -48,6 +49,59 @@ Spring configuration
             <bean class="org.springframework.web.servlet.view.mustache.MustacheTemplateLoader"" />
         </property>
     </bean>
+    
+A more complex configuration:
+
+	<bean id="mustacheTemplateLoader"
+		class="org.springframework.web.servlet.view.mustache.MustacheTemplateLoader" />
+		
+	<bean
+		class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="order" value="1" />
+		<property name="mediaTypes">
+			<map>
+				<entry key="json" value="application/json" />
+				<entry key="pdf" value="application/pdf" />
+			</map>
+		</property>
+		<property name="defaultViews">
+			<list>
+				<!-- JSON View -->
+				<bean
+					class="org.springframework.web.servlet.view.json.MappingJacksonJsonView">
+				</bean>
+			</list>
+		</property>
+		<property name="ignoreAcceptHeader" value="true" />
+	</bean>
+
+	<bean id="mustacheViewResolver" class="org.springframework.web.servlet.view.mustache.MustacheViewResolver">
+		<property name="order" value="2" />
+		<property name="prefix" value="/WEB-INF/mustache/" />
+		<property name="suffix" value=".mustache" />
+		<property name="templateLoader" ref="mustacheTemplateLoader" />
+		<property name="excludedViewNames">
+			<list>
+				<value>*.json</value>
+				<value>*.pdf</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="mustachePDFViewResolver"
+		class="org.springframework.web.servlet.view.mustache.pdf.MustachePDFViewResolver">
+		<property name="order" value="3" />
+		<property name="prefix" value="/WEB-INF/mustache/" />
+		<!-- Store the layouts in a different folder -->
+		<!-- <property name="prefix" value="/WEB-INF/mustache/pdf/" /> -->
+		<property name="suffix" value=".mustache" />
+		<property name="templateLoader" ref="mustacheTemplateLoader" />
+		<property name="viewNames">
+			<list>
+				<value>*.pdf</value>
+			</list>
+		</property>
+	</bean>
     
 Example
 -------------
