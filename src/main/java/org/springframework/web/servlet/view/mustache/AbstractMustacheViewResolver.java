@@ -23,10 +23,14 @@ public abstract class AbstractMustacheViewResolver extends
 
 	final MustacheView view = (MustacheView) super.buildView(viewName);
 
-	Mustache template = templateLoader.compile(view.getUrl());
+	Mustache template = templateLoader.compile(getRealUrl(view.getUrl()));
 	view.setTemplate(template);
 
 	return view;
+    }
+
+    protected String getRealUrl(String url) {
+	return url;
     }
 
     /**
